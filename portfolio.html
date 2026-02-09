@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Harsh Singh | Creative Developer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0a0a0a;
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+        
+        h1, h2, h3, .display-font {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0a0a0a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+        
+        /* Letter animation wrapper */
+        .letter {
+            display: inline-block;
+            opacity: 0;
+            transform: translateY(100px) rotateX(-90deg);
+        }
+        
+        .word {
+            display: inline-block;
+            overflow: hidden;
+        }
+        
+        /* Floating shapes */
+        .floating-shape {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(60px);
+            opacity: 0.4;
+            pointer-events: none;
+        }
+        
+        /* Project card */
+        .project-card {
+            transform-style: preserve-3d;
+            perspective: 1000px;
+        }
+        
+        /* Skill bar */
+        .skill-progress {
+            transform-origin: left;
+            transform: scaleX(0);
+        }
+        
+        /* Form input animation */
+        .form-input:focus ~ .input-line,
+        .form-input:not(:placeholder-shown) ~ .input-line {
+            transform: scaleX(1);
+        }
+        
+        .form-input:focus ~ .input-label,
+        .form-input:not(:placeholder-shown) ~ .input-label {
+            transform: translateY(-24px) scale(0.85);
+            color: #60a5fa;
+        }
+        
+        /* Cursor follower */
+        .cursor-dot {
+            width: 8px;
+            height: 8px;
+            background: white;
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            mix-blend-mode: difference;
+        }
+        
+        .cursor-outline {
+            width: 40px;
+            height: 40px;
+            border: 1px solid rgba(255,255,255,0.5);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9998;
+            transition: transform 0.1s;
+        }
+        
+        /* Loading screen */
+        .loader {
+            position: fixed;
+            inset: 0;
+            background: #0a0a0a;
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .loader-text {
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: 0.5em;
+        }
+        
+        /* Gradient text */
+        .gradient-text {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        /* Section transitions */
+        .section-reveal {
+            opacity: 0;
+            transform: translateY(40px);
+        }
+        
+        /* Magnetic button */
+        .magnetic-btn {
+            transition: transform 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+        
+        /* Scramble text effect */
+        .scramble-text {
+            font-family: 'Space Grotesk', monospace;
+        }
+        
+        /* Custom selection */
+        ::selection {
+            background: #60a5fa;
+            color: #0a0a0a;
+        }
+    </style>
+<base target="_blank">
+</head>
+<body class="antialiased">
+
+    <!-- Loading Screen -->
+    <div class="loader" id="loader">
+        <div class="loader-text">
+            <span class="inline-block" id="loader-h">H</span>
+            <span class="inline-block" id="loader-s">S</span>
+        </div>
+    </div>
+
+    <!-- Custom Cursor -->
+    <div class="cursor-dot hidden md:block" id="cursor-dot"></div>
+    <div class="cursor-outline hidden md:block" id="cursor-outline"></div>
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-50 px-6 py-4 mix-blend-difference">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <a href="#" class="text-2xl font-bold tracking-tighter display-font" id="logo">
+                HS<span class="text-blue-400">.</span>
+            </a>
+            <div class="hidden md:flex gap-8 text-sm font-medium tracking-wide">
+                <a href="#about" class="nav-link hover:text-blue-400 transition-colors">ABOUT</a>
+                <a href="#projects" class="nav-link hover:text-blue-400 transition-colors">PROJECTS</a>
+                <a href="#skills" class="nav-link hover:text-blue-400 transition-colors">SKILLS</a>
+                <a href="#contact" class="nav-link hover:text-blue-400 transition-colors">CONTACT</a>
+            </div>
+            <button class="md:hidden text-white" id="menu-toggle">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                </svg>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div class="fixed inset-0 bg-black z-40 transform translate-x-full transition-transform duration-500" id="mobile-menu">
+        <div class="flex flex-col items-center justify-center h-full gap-8 text-3xl font-bold">
+            <a href="#about" class="mobile-link">ABOUT</a>
+            <a href="#projects" class="mobile-link">PROJECTS</a>
+            <a href="#skills" class="mobile-link">SKILLS</a>
+            <a href="#contact" class="mobile-link">CONTACT</a>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="relative min-h-screen flex items-center justify-center overflow-hidden" id="hero">
+        <!-- Floating Background Shapes -->
+        <div class="floating-shape w-96 h-96 bg-purple-600 top-20 -left-20" id="shape1"></div>
+        <div class="floating-shape w-64 h-64 bg-blue-600 bottom-20 right-10" id="shape2"></div>
+        <div class="floating-shape w-80 h-80 bg-pink-600 top-1/2 left-1/3" id="shape3"></div>
+        
+        <!-- Grid Pattern -->
+        <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(circle at 1px 1px, white 1px, transparent 0); background-size: 50px 50px;"></div>
+
+        <div class="relative z-10 max-w-7xl mx-auto px-6 text-center">
+            <div class="mb-6 overflow-hidden">
+                <p class="text-blue-400 text-sm tracking-[0.3em] uppercase mb-4 opacity-0" id="hero-subtitle-top">
+                    Computer Science Engineer
+                </p>
+            </div>
+            
+            <h1 class="text-6xl md:text-8xl lg:text-9xl font-bold tracking-tighter mb-6 display-font" id="hero-title">
+                <div class="overflow-hidden">
+                    <span class="inline-block" id="name-harsh">HARSH</span>
+                </div>
+                <div class="overflow-hidden">
+                    <span class="inline-block gradient-text" id="name-singh">SINGH</span>
+                </div>
+            </h1>
+            
+            <div class="max-w-2xl mx-auto mb-12">
+                <p class="text-lg md:text-xl text-gray-400 leading-relaxed opacity-0" id="hero-description">
+                    Aspiring developer crafting immersive digital experiences through code and creativity. 
+                    Specializing in web technologies and problem-solving.
+                </p>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-4 justify-center items-center opacity-0" id="hero-cta">
+                <a href="#projects" class="magnetic-btn group relative px-8 py-4 bg-white text-black font-semibold rounded-full overflow-hidden">
+                    <span class="relative z-10 flex items-center gap-2">
+                        View Projects
+                        <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                        </svg>
+                    </span>
+                    <div class="absolute inset-0 bg-blue-400 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300"></div>
+                </a>
+                <a href="#contact" class="magnetic-btn px-8 py-4 border border-white/30 rounded-full hover:bg-white/10 transition-colors">
+                    Get in Touch
+                </a>
+            </div>
+        </div>
+
+        <!-- Scroll Indicator -->
+        <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 opacity-0" id="scroll-indicator">
+            <div class="w-6 h-10 border-2 border-white/30 rounded-full flex justify-center pt-2">
+                <div class="w-1 h-2 bg-white rounded-full animate-bounce"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="relative py-32 bg-white text-black" id="about">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="grid md:grid-cols-2 gap-16 items-center">
+                <!-- Image Side -->
+                <div class="relative section-reveal" id="about-image-container">
+                    <div class="relative aspect-square rounded-3xl overflow-hidden bg-gray-100">
+                        <div class="absolute inset-0 bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center">
+                            <div class="text-6xl font-bold text-gray-300 display-font">HS</div>
+                        </div>
+                        <!-- Decorative elements -->
+                        <div class="absolute -top-4 -right-4 w-24 h-24 bg-blue-400 rounded-full opacity-20"></div>
+                        <div class="absolute -bottom-4 -left-4 w-32 h-32 bg-purple-400 rounded-full opacity-20"></div>
+                    </div>
+                    <!-- Floating badge -->
+                    <div class="absolute -bottom-6 -right-6 bg-black text-white px-6 py-3 rounded-full font-medium transform rotate-12" id="experience-badge">
+                        2023-2027
+                    </div>
+                </div>
+
+                <!-- Content Side -->
+                <div class="section-reveal" id="about-content">
+                    <p class="text-blue-600 text-sm tracking-[0.3em] uppercase mb-4">About Me</p>
+                    <h2 class="text-4xl md:text-5xl font-bold mb-6 display-font leading-tight">
+                        Building digital experiences with passion & precision
+                    </h2>
+                    
+                    <div class="space-y-4 text-gray-600 text-lg leading-relaxed mb-8">
+                        <p class="about-text opacity-0 translate-x-[-50px]">
+                            I'm Harsh Singh, a Computer Science student at Institute of Technical Education and Research, India. With a strong foundation in programming and web technologies, I'm passionate about creating solutions that make a difference.
+                        </p>
+                        <p class="about-text opacity-0 translate-x-[50px]">
+                            My journey includes developing a comprehensive Financial Tracking Application that helps users monitor their personal finances efficiently. I believe in continuous learning and collaborative problem-solving.
+                        </p>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-6 mb-8">
+                        <div class="about-stat opacity-0">
+                            <div class="text-3xl font-bold text-blue-600 display-font">10+</div>
+                            <div class="text-sm text-gray-500">Years in Arts</div>
+                        </div>
+                        <div class="about-stat opacity-0">
+                            <div class="text-3xl font-bold text-purple-600 display-font">3+</div>
+                            <div class="text-sm text-gray-500">Programming Languages</div>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-4">
+                        <div class="flex items-center gap-2 text-sm text-gray-600 about-detail opacity-0">
+                            <span class="w-2 h-2 bg-green-400 rounded-full"></span>
+                            Football Player
+                        </div>
+                        <div class="flex items-center gap-2 text-sm text-gray-600 about-detail opacity-0">
+                            <span class="w-2 h-2 bg-blue-400 rounded-full"></span>
+                            Problem Solver
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Projects Section -->
+    <section class="relative py-32 bg-[#0a0a0a]" id="projects">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-20 section-reveal">
+                <p class="text-blue-400 text-sm tracking-[0.3em] uppercase mb-4">Featured Work</p>
+                <h2 class="text-5xl md:text-6xl font-bold display-font">Projects</h2>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Project Card 1 -->
+                <div class="project-card group relative bg-white/5 rounded-3xl overflow-hidden border border-white/10 hover:border-blue-400/50 transition-colors duration-500 section-reveal">
+                    <div class="aspect-video bg-gradient-to-br from-blue-900 to-purple-900 relative overflow-hidden">
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <svg class="w-20 h-20 text-white/20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </div>
+                        <!-- Animated overlay on hover -->
+                        <div class="absolute inset-0 bg-blue-600/20 transform translate-y-full group-hover:translate-y-0 transition-transform duration-500"></div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold mb-2 group-hover:text-blue-400 transition-colors">Financial Tracker</h3>
+                        <p class="text-gray-400 text-sm mb-4">Web-based personal finance management application with MySQL backend and data visualization.</p>
+                        <div class="flex gap-2 flex-wrap">
+                            <span class="px-3 py-1 bg-white/10 rounded-full text-xs">HTML</span>
+                            <span class="px-3 py-1 bg-white/10 rounded-full text-xs">CSS</span>
+                            <span class="px-3 py-1 bg-white/10 rounded-full text-xs">JavaScript</span>
+                            <span class="px-3 py-1 bg-white/10 rounded-full text-xs">MySQL</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project Card 2 -->
+                <div class="project-card group relative bg-white/5 rounded-3xl overflow-hidden border border-white/10 hover:border-purple-400/50 transition-colors duration-500 section-reveal">
+                    <div class="aspect-video bg-gradient-to-br from-purple-900 to-pink-900 relative overflow-hidden">
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <svg class="w-20 h-20 text-white/20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                            </svg>
+                        </div>
+                        <div class="absolute inset-0 bg-purple-600/20 transform translate-y-full group-hover:translate-y-0 transition-transform duration-500"></div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold mb-2 group-hover:text-purple-400 transition-colors">Portfolio Website</h3>
+                        <p class="text-gray-400 text-sm mb-4">Interactive portfolio showcasing creative development skills with advanced animations.</p>
+                        <div class="flex gap-2 flex-wrap">
+                            <span class="px-3 py-1 bg-white/10 rounded-full text-xs">Anime.js</span>
+                            <span class="px-3 py-1 bg-white/10 rounded-full text-xs">Tailwind</span>
+                            <span class="px-3 py-1 bg-white/10 rounded-full text-xs">JavaScript</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project Card 3 -->
+                <div class="project-card group relative bg-white/5 rounded-3xl overflow-hidden border border-white/10 hover:border-green-400/50 transition-colors duration-500 section-reveal">
+                    <div class="aspect-video bg-gradient-to-br from-green-900 to-teal-900 relative overflow-hidden">
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <svg class="w-20 h-20 text-white/20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                            </svg>
+                        </div>
+                        <div class="absolute inset-0 bg-green-600/20 transform translate-y-full group-hover:translate-y-0 transition-transform duration-500"></div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold mb-2 group-hover:text-green-400 transition-colors">Algorithm Visualizer</h3>
+                        <p class="text-gray-400 text-sm mb-4">Interactive tool for visualizing data structures and algorithms in real-time.</p>
+                        <div class="flex gap-2 flex-wrap">
+                            <span class="px-3 py-1 bg-white/10 rounded-full text-xs">Python</span>
+                            <span class="px-3 py-1 bg-white/10 rounded-full text-xs">C</span>
+                            <span class="px-3 py-1 bg-white/10 rounded-full text-xs">DSA</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Skills Section -->
+    <section class="relative py-32 bg-white text-black" id="skills">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-20 section-reveal">
+                <p class="text-blue-600 text-sm tracking-[0.3em] uppercase mb-4">Expertise</p>
+                <h2 class="text-5xl md:text-6xl font-bold display-font">Skills & Technologies</h2>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-16">
+                <!-- Technical Skills -->
+                <div class="section-reveal">
+                    <h3 class="text-2xl font-bold mb-8 display-font">Technical Skills</h3>
+                    <div class="space-y-6">
+                        <div class="skill-item">
+                            <div class="flex justify-between mb-2">
+                                <span class="font-medium">HTML / CSS / JavaScript</span>
+                                <span class="text-gray-500">90%</span>
+                            </div>
+                            <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
+                                <div class="skill-progress h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full" data-width="90"></div>
+                            </div>
+                        </div>
+                        <div class="skill-item">
+                            <div class="flex justify-between mb-2">
+                                <span class="font-medium">C Programming</span>
+                                <span class="text-gray-500">85%</span>
+                            </div>
+                            <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
+                                <div class="skill-progress h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full" data-width="85"></div>
+                            </div>
+                        </div>
+                        <div class="skill-item">
+                            <div class="flex justify-between mb-2">
+                                <span class="font-medium">Python</span>
+                                <span class="text-gray-500">80%</span>
+                            </div>
+                            <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
+                                <div class="skill-progress h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full" data-width="80"></div>
+                            </div>
+                        </div>
+                        <div class="skill-item">
+                            <div class="flex justify-between mb-2">
+                                <span class="font-medium">MySQL / Git</span>
+                                <span class="text-gray-500">75%</span>
+                            </div>
+                            <div class="h-2 bg-gray-200 rounded-full overflow-hidden">
+                                <div class="skill-progress h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full" data-width="75"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Core Competencies -->
+                <div class="section-reveal">
+                    <h3 class="text-2xl font-bold mb-8 display-font">Core Competencies</h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="competency-card p-6 bg-gray-50 rounded-2xl hover:bg-black hover:text-white transition-all duration-300 group cursor-pointer">
+                            <div class="text-3xl mb-3 group-hover:scale-110 transition-transform">🧩</div>
+                            <h4 class="font-bold mb-1">Problem Solving</h4>
+                            <p class="text-sm text-gray-500 group-hover:text-gray-300">Analytical thinking & debugging</p>
+                        </div>
+                        <div class="competency-card p-6 bg-gray-50 rounded-2xl hover:bg-black hover:text-white transition-all duration-300 group cursor-pointer">
+                            <div class="text-3xl mb-3 group-hover:scale-110 transition-transform">🎨</div>
+                            <h4 class="font-bold mb-1">Web Development</h4>
+                            <p class="text-sm text-gray-500 group-hover:text-gray-300">Frontend & backend integration</p>
+                        </div>
+                        <div class="competency-card p-6 bg-gray-50 rounded-2xl hover:bg-black hover:text-white transition-all duration-300 group cursor-pointer">
+                            <div class="text-3xl mb-3 group-hover:scale-110 transition-transform">📊</div>
+                            <h4 class="font-bold mb-1">Data Structures</h4>
+                            <p class="text-sm text-gray-500 group-hover:text-gray-300">Efficient algorithm design</p>
+                        </div>
+                        <div class="competency-card p-6 bg-gray-50 rounded-2xl hover:bg-black hover:text-white transition-all duration-300 group cursor-pointer">
+                            <div class="text-3xl mb-3 group-hover:scale-110 transition-transform">🤝</div>
+                            <h4 class="font-bold mb-1">Team Collaboration</h4>
+                            <p class="text-sm text-gray-500 group-hover:text-gray-300">Communication & leadership</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Languages -->
+            <div class="mt-20 section-reveal">
+                <h3 class="text-2xl font-bold mb-8 display-font text-center">Languages</h3>
+                <div class="flex justify-center gap-8 flex-wrap">
+                    <div class="language-item text-center opacity-0 transform scale-0">
+                        <div class="w-20 h-20 rounded-full bg-black text-white flex items-center justify-center text-2xl font-bold mb-2 mx-auto">EN</div>
+                        <p class="font-medium">English</p>
+                        <p class="text-sm text-gray-500">Fluent</p>
+                    </div>
+                    <div class="language-item text-center opacity-0 transform scale-0">
+                        <div class="w-20 h-20 rounded-full bg-black text-white flex items-center justify-center text-2xl font-bold mb-2 mx-auto">HI</div>
+                        <p class="font-medium">Hindi</p>
+                        <p class="text-sm text-gray-500">Native</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="relative py-32 bg-[#0a0a0a]" id="contact">
+        <!-- Background decoration -->
+        <div class="absolute inset-0 overflow-hidden">
+            <div class="absolute top-0 left-1/4 w-96 h-96 bg-blue-600/10 rounded-full filter blur-3xl"></div>
+            <div class="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-600/10 rounded-full filter blur-3xl"></div>
+        </div>
+
+        <div class="relative z-10 max-w-4xl mx-auto px-6">
+            <div class="text-center mb-16 section-reveal">
+                <p class="text-blue-400 text-sm tracking-[0.3em] uppercase mb-4">Get in Touch</p>
+                <h2 class="text-5xl md:text-6xl font-bold display-font mb-4">Let's Connect</h2>
+                <p class="text-gray-400">Have a project in mind? Let's create something amazing together.</p>
+            </div>
+
+            <form class="space-y-8 section-reveal" id="contact-form">
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="relative">
+                        <input type="text" id="name" class="form-input w-full bg-white/5 border border-white/20 rounded-lg px-4 py-4 text-white placeholder-transparent focus:outline-none focus:border-blue-400 transition-colors" placeholder="Name" required>
+                        <label for="name" class="input-label absolute left-4 top-4 text-gray-400 pointer-events-none transition-all duration-300">Your Name</label>
+                        <div class="input-line absolute bottom-0 left-0 right-0 h-0.5 bg-blue-400 transform scale-x-0 transition-transform duration-300"></div>
+                    </div>
+                    <div class="relative">
+                        <input type="email" id="email" class="form-input w-full bg-white/5 border border-white/20 rounded-lg px-4 py-4 text-white placeholder-transparent focus:outline-none focus:border-blue-400 transition-colors" placeholder="Email" required>
+                        <label for="email" class="input-label absolute left-4 top-4 text-gray-400 pointer-events-none transition-all duration-300">Your Email</label>
+                        <div class="input-line absolute bottom-0 left-0 right-0 h-0.5 bg-blue-400 transform scale-x-0 transition-transform duration-300"></div>
+                    </div>
+                </div>
+                <div class="relative">
+                    <textarea id="message" rows="5" class="form-input w-full bg-white/5 border border-white/20 rounded-lg px-4 py-4 text-white placeholder-transparent focus:outline-none focus:border-blue-400 transition-colors resize-none" placeholder="Message" required></textarea>
+                    <label for="message" class="input-label absolute left-4 top-4 text-gray-400 pointer-events-none transition-all duration-300">Your Message</label>
+                    <div class="input-line absolute bottom-0 left-0 right-0 h-0.5 bg-blue-400 transform scale-x-0 transition-transform duration-300"></div>
+                </div>
+
+                <div class="text-center">
+                    <button type="submit" class="magnetic-btn group relative px-12 py-4 bg-white text-black font-bold rounded-full overflow-hidden text-lg" id="submit-btn">
+                        <span class="relative z-10 flex items-center gap-2" id="btn-text">
+                            Send Message
+                            <svg class="w-5 h-5 transform group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+                            </svg>
+                        </span>
+                        <span class="absolute inset-0 bg-green-400 flex items-center justify-center transform translate-y-full transition-transform duration-300" id="btn-success">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+                            </svg>
+                        </span>
+                        <div class="absolute inset-0 bg-blue-400 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300"></div>
+                    </button>
+                </div>
+            </form>
+
+            <!-- Contact Info -->
+            <div class="mt-16 flex flex-wrap justify-center gap-8 section-reveal">
+                <a href="mailto:harsh.singh5722@gmail.com" class="flex items-center gap-3 text-gray-400 hover:text-white transition-colors group">
+                    <div class="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-blue-400/20 transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                        </svg>
+                    </div>
+                    <span>harsh.singh5722@gmail.com</span>
+                </a>
+                <a href="tel:+919835895072" class="flex items-center gap-3 text-gray-400 hover:text-white transition-colors group">
+                    <div class="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-blue-400/20 transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
+                        </svg>
+                    </div>
+                    <span>+91-9835895072</span>
+                </a>
+                <a href="#" class="flex items-center gap-3 text-gray-400 hover:text-white transition-colors group">
+                    <div class="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-blue-400/20 transition-colors">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                        </svg>
+                    </div>
+                    <span>LinkedIn</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-8 bg-black border-t border-white/10">
+        <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4">
+            <p class="text-gray-500 text-sm">© 2025 Harsh Singh. All rights reserved.</p>
+            <p class="text-gray-600 text-sm">Crafted with passion & Anime.js</p>
+        </div>
+    </footer>
+
+    <script>
+        // Loading Animation
+        window.addEventListener('load', () => {
+            const loaderTimeline = anime.timeline({
+                easing: 'easeOutExpo'
+            });
+
+            loaderTimeline
+                .add({
+                    targets: '#loader-h',
+                    translateY: [50, 0],
+                    opacity: [0, 1],
+                    duration: 800,
+                    delay: 200
+                })
+                .add({
+                    targets: '#loader-s',
+                    translateY: [50, 0],
+                    opacity: [0, 1],
+                    duration: 800
+                }, '-=600')
+                .add({
+                    targets: '.loader-text',
+                    scale: [1, 0.8],
+                    opacity: [1, 0],
+                    duration: 600,
+                    delay: 500
+                })
+                .add({
+                    targets: '#loader',
+                    clipPath: ['circle(150% at 50% 50%)', 'circle(0% at 50% 50%)'],
+                    duration: 1000,
+                    easing: 'easeInOutExpo',
+                    complete: () => {
+                        document.getElementById('loader').style.display = 'none';
+                        initHeroAnimations();
+                    }
+                });
+        });
+
+        // Hero Animations
+        function initHeroAnimations() {
+            const heroTimeline = anime.timeline({
+                easing: 'easeOutExpo'
+            });
+
+            // Title animation - letter by letter effect using scale and translate
+            heroTimeline
+                .add({
+                    targets: '#hero-subtitle-top',
+                    translateY: [30, 0],
+                    opacity: [0, 1],
+                    duration: 1000
+                })
+                .add({
+                    targets: '#name-harsh',
+                    translateY: [100, 0],
+                    rotateX: [-90, 0],
+                    opacity: [0, 1],
+                    duration: 1200,
+                    easing: 'easeOutElastic(1, .6)'
+                }, '-=600')
+                .add({
+                    targets: '#name-singh',
+                    translateY: [100, 0],
+                    rotateX: [-90, 0],
+                    opacity: [0, 1],
+                    duration: 1200,
+                    easing: 'easeOutElastic(1, .6)'
+                }, '-=1000')
+                .add({
+                    targets: '#hero-description',
+                    translateY: [30, 0],
+                    opacity: [0, 1],
+                    duration: 1000
+                }, '-=800')
+                .add({
+                    targets: '#hero-cta',
+                    translateY: [30, 0],
+                    opacity: [0, 1],
+                    duration: 800
+                }, '-=600')
+                .add({
+                    targets: '#scroll-indicator',
+                    opacity: [0, 1],
+                    translateY: [-20, 0],
+                    duration: 800
+                }, '-=400');
+
+            // Floating shapes continuous animation
+            anime({
+                targets: '#shape1',
+                translateX: [0, 100, 0],
+                translateY: [0, -50, 0],
+                scale: [1, 1.2, 1],
+                duration: 20000,
+                loop: true,
+                easing: 'easeInOutSine'
+            });
+
+            anime({
+                targets: '#shape2',
+                translateX: [0, -80, 0],
+                translateY: [0, 60, 0],
+                duration: 25000,
+                loop: true,
+                easing: 'easeInOutSine'
+            });
+
+            anime({
+                targets: '#shape3',
+                translateX: [0, 60, 0],
+                translateY: [0, -80, 0],
+                duration: 22000,
+                loop: true,
+                easing: 'easeInOutSine'
+            });
+        }
+
+        // Custom Cursor
+        const cursorDot = document.getElementById('cursor-dot');
+        const cursorOutline = document.getElementById('cursor-outline');
+
+        window.addEventListener('mousemove', (e) => {
+            const posX = e.clientX;
+            const posY = e.clientY;
+
+            cursorDot.style.left = `${posX}px`;
+            cursorDot.style.top = `${posY}px`;
+
+            // Delayed follow for outline
+            anime({
+                targets: cursorOutline,
+                left: posX,
+                top: posY,
+                duration: 500,
+                easing: 'easeOutExpo'
+            });
+        });
+
+        // Magnetic button effect
+        document.querySelectorAll('.magnetic-btn').forEach(btn => {
+            btn.addEventListener('mousemove', (e) => {
+                const rect = btn.getBoundingClientRect();
+                const x = e.clientX - rect.left - rect.width / 2;
+                const y = e.clientY - rect.top - rect.height / 2;
+                
+                anime({
+                    targets: btn,
+                    translateX: x * 0.3,
+                    translateY: y * 0.3,
+                    duration: 300,
+                    easing: 'easeOutExpo'
+                });
+            });
+
+            btn.addEventListener('mouseleave', () => {
+                anime({
+                    targets: btn,
+                    translateX: 0,
+                    translateY: 0,
+                    duration: 300,
+                    easing: 'easeOutElastic(1, .5)'
+                });
+            });
+        });
+
+        // Intersection Observer for scroll animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const el = entry.target;
+                    
+                    if (el.classList.contains('section-reveal')) {
+                        anime({
+                            targets: el,
+                            opacity: [0, 1],
+                            translateY: [40, 0],
+                            duration: 1000,
+                            easing: 'easeOutExpo'
+                        });
+                    }
+
+                    // About section specific animations
+                    if (el.id === 'about-content') {
+                        anime({
+                            targets: '.about-text',
+                            opacity: [0, 1],
+                            translateX: (el, i) => i % 2 === 0 ? [-50, 0] : [50, 0],
+                            delay: anime.stagger(200),
+                            duration: 1000,
+                            easing: 'easeOutExpo'
+                        });
+
+                        anime({
+                            targets: '.about-stat',
+                            opacity: [0, 1],
+                            translateY: [20, 0],
+                            delay: anime.stagger(100, {start: 400}),
+                            duration: 800,
+                            easing: 'easeOutExpo'
+                        });
+
+                        anime({
+                            targets: '.about-detail',
+                            opacity: [0, 1],
+                            delay: anime.stagger(100, {start: 600}),
+                            duration: 600
+                        });
+                    }
+
+                    // Skills animation
+                    if (el.id === 'skills') {
+                        // Animate progress bars
+                        document.querySelectorAll('.skill-progress').forEach(bar => {
+                            const width = bar.getAttribute('data-width');
+                            anime({
+                                targets: bar,
+                                scaleX: [0, width / 100],
+                                duration: 1500,
+                                easing: 'easeOutExpo',
+                                delay: anime.stagger(100)
+                            });
+                        });
+
+                        // Animate competency cards
+                        anime({
+                            targets: '.competency-card',
+                            opacity: [0, 1],
+                            translateY: [30, 0],
+                            delay: anime.stagger(100, {start: 300}),
+                            duration: 800,
+                            easing: 'easeOutExpo'
+                        });
+
+                        // Animate languages
+                        anime({
+                            targets: '.language-item',
+                            opacity: [0, 1],
+                            scale: [0, 1],
+                            delay: anime.stagger(150, {start: 500}),
+                            duration: 800,
+                            easing: 'easeOutElastic(1, .6)'
+                        });
+                    }
+
+                    observer.unobserve(el);
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.section-reveal').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Project cards hover effect with 3D tilt
+        document.querySelectorAll('.project-card').forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                const rotateX = (y - centerY) / 20;
+                const rotateY = (centerX - x) / 20;
+
+                anime({
+                    targets: card,
+                    rotateX: rotateX,
+                    rotateY: rotateY,
+                    scale: 1.02,
+                    duration: 300,
+                    easing: 'easeOutExpo'
+                });
+            });
+
+            card.addEventListener('mouseleave', () => {
+                anime({
+                    targets: card,
+                    rotateX: 0,
+                    rotateY: 0,
+                    scale: 1,
+                    duration: 500,
+                    easing: 'easeOutElastic(1, .5)'
+                });
+            });
+        });
+
+        // Contact form handling
+        const contactForm = document.getElementById('contact-form');
+        const submitBtn = document.getElementById('submit-btn');
+        const btnText = document.getElementById('btn-text');
+        const btnSuccess = document.getElementById('btn-success');
+
+        contactForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            // Animate button to success state
+            anime({
+                targets: btnSuccess,
+                translateY: ['100%', '0%'],
+                duration: 500,
+                easing: 'easeOutExpo'
+            });
+
+            // Reset after delay
+            setTimeout(() => {
+                anime({
+                    targets: btnSuccess,
+                    translateY: ['0%', '100%'],
+                    duration: 500,
+                    easing: 'easeInExpo'
+                });
+                contactForm.reset();
+            }, 2000);
+        });
+
+        // Smooth scroll for navigation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    // Close mobile menu if open
+                    document.getElementById('mobile-menu').classList.add('translate-x-full');
+                    
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Mobile menu toggle
+        const menuToggle = document.getElementById('menu-toggle');
+        const mobileMenu = document.getElementById('mobile-menu');
+        let menuOpen = false;
+
+        menuToggle.addEventListener('click', () => {
+            menuOpen = !menuOpen;
+            if (menuOpen) {
+                mobileMenu.classList.remove('translate-x-full');
+                anime({
+                    targets: '.mobile-link',
+                    opacity: [0, 1],
+                    translateY: [20, 0],
+                    delay: anime.stagger(100),
+                    duration: 600,
+                    easing: 'easeOutExpo'
+                });
+            } else {
+                mobileMenu.classList.add('translate-x-full');
+            }
+        });
+        // Parallax effect on hero shapes based on mouse position
+        document.getElementById('hero').addEventListener('mousemove', (e) => {
+            const mouseX = e.clientX / window.innerWidth - 0.5;
+            const mouseY = e.clientY / window.innerHeight - 0.5;
+            anime({
+                targets: '#shape1',
+                translateX: mouseX * 50,
+                translateY: mouseY * 50,
+                duration: 1000,
+                easing: 'easeOutExpo'
+            });
+            anime({
+                targets: '#shape2',
+                translateX: mouseX * -30,
+                translateY: mouseY * -30,
+                duration: 1000,
+                easing: 'easeOutExpo'
+            });
+        });
+        // Logo hover animation
+        const logo = document.getElementById('logo');
+        logo.addEventListener('mouseenter', () => {
+            anime({
+                targets: logo,
+                scale: 1.1,
+                rotate: [0, 5, -5, 0],
+                duration: 600,
+                easing: 'easeOutElastic(1, .5)'
+            });
+        });
+        logo.addEventListener('mouseleave', () => {
+            anime({
+                targets: logo,
+                scale: 1,
+                duration: 300
+            });
+        });
+        // Experience badge rotation on scroll
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            const badge = document.getElementById('experience-badge');
+            if (badge) {
+                badge.style.transform = `rotate(${12 + scrolled * 0.05}deg)`;
+            }
+        });
+    </script>
+</body>
+</html>
